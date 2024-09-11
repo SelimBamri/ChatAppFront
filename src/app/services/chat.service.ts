@@ -11,7 +11,6 @@ export class ChatService {
   public messages$ = new BehaviorSubject<any>([]);
   public users$ = new BehaviorSubject<string[]>([]);
   public messages: any[] = [];
-  public users: string[] = [];
 
   public connection: signalR.HubConnection = new signalR.HubConnectionBuilder()
     .withUrl(`${this.API_URL}/chat`)
@@ -20,13 +19,13 @@ export class ChatService {
   constructor() {
     this.start();
     this.connection.on(
-      'RecieveMessage',
+      'ReceiveMessage',
       (user: string, message: string, messageTime: string) => {
         this.messages = [...this.messages, { user, message, messageTime }];
         this.messages$.next(this.messages);
       }
     );
-    this.connection.on('ConnectedUser', (users: any) => {
+    this.connection.on('ConnectedUsers', (users: any) => {
       this.users$.next(users);
     });
   }
@@ -44,5 +43,13 @@ export class ChatService {
 
   public async joinRoom(user: string, room: string) {
     return this.connection.invoke('JoinRoom', { user, room });
+  }
+
+  public async sendMessage(message: string) {
+    return this.connection.invoke('SendMessage', message);
+  }
+
+  public async leaveChat() {
+    return this.connection.stop();
   }
 }
