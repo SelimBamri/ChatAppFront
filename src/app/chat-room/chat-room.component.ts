@@ -11,6 +11,7 @@ import { ChatService } from '../services/chat.service';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-chat-room',
@@ -32,12 +33,19 @@ export class ChatRoomComponent implements OnInit, AfterViewChecked {
   faPaperPlane = faPaperPlane;
   messages: any[] = [];
   users: string[] = [];
+  router = inject(Router);
   roomName = localStorage.getItem('room');
   loggedInUserName = localStorage.getItem('user');
   inputMessage!: string;
   chatService = inject(ChatService);
-  leaveChat() {}
-  sendMessage() {}
+  leaveChat() {
+    localStorage.clear();
+    this.chatService.leaveChat();
+    this.router.navigate(['']);
+  }
+  sendMessage() {
+    this.chatService.sendMessage(this.inputMessage);
+  }
   ngOnInit(): void {
     this.roomName = localStorage.getItem('room');
     this.loggedInUserName = localStorage.getItem('user');
